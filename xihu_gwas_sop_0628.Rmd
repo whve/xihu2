@@ -98,7 +98,87 @@ plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno 
 ## 连续性状（定量性状）linear
 
 # a3 output data
+```{bash}
+awk '!/'NA'/' re_logistic_pca10_age_4342_low.assoc.logistic >re_logistic_pca10_age_4342_low.assoc_NA.logistic
+awk '!/'NA'/' re_logistic_pca10_age_4342_huge.assoc.logistic >re_logistic_pca10_age_4342_huge.assoc_NA.logistic
+# 16G->9G -> ?
+# p>10e-2? 
+
+# 处理.gz----
+library(data.table)
+# if not .gz, can i use fread
+data_huge <- fread("/home/wangzhe/projects/data_0628/re_logistic_pca10_age_4342_huge.assoc_NA.logistic") 
+#system.time(t2 <- fread(____))
+
+#data <- fread("/home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc2.logistic.gz") #donot view big file  
+
+
+data1 <- data_huge %>% 
+  filter(P<10e-8) # 110145192
+  
+write_delim(data1, "/home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_huge.assoc_e-8.logistic",col_names = T) # 注意保存文件的分隔符是？
+
+data1 <- data_huge %>% 
+  filter(P<10e-2) # 997588
+write_delim(data1, "/home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_huge.assoc_e-2.logistic",col_names = T) # 注意保存文件的分隔符是？
+
+
+# other
+data_low <- fread("/home/wangzhe/projects/data_0628/1_low/re_logistic_pca10_age_4342_low.assoc_NA.logistic") 
+data1 <- data_low %>% 
+  filter(P<10e-2) # 10558187
+  
+write_delim(data1, "/home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_low.assoc_e-2.logistic",col_names = T) # 注意保存文件的分隔符是？
+
+# 再小也要压缩 sop 😊
+gzip /home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_low.assoc_e-2.logistic
+gzip /home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_huge.assoc_e-2.logistic
+
+
+```
 
 # plot
 
 # with python
+
+# 自动化处理
+```{bash}
+# 去除NA行
+awk '!/'NA'/' re_linear_v1.assoc.linear >re_linear_v1.assoc2.linear
+# 压缩
+gzip re_linear_v1.assoc2.linear
+# 预览压缩
+zcat re_linear_v1.assoc2.linear.gz | head
+gzip -cd re_linear_v1.assoc2.linear.gz | head
+# 提取压缩文件p value <e8?
+# 提取压缩文件前10行？
+
+# 处理.gz----
+library(data.table)
+famid1 <- fread("/home/wangzhe/projects/gwas/SNP_data/gcta_pca/selected_two_cohorts.fam.gz")
+# succeed
+data <- fread("/home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc2.logistic.gz") #donot view big file  
+# succeed
+data1 <- data %>% 
+  filter(P<10e-8)
+write_delim(data1, "/home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc_pvalue8.logistic",col_names = T) # 注意保存文件的分隔符
+system("gzip /home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc_pvalue8.logistic")
+
+# snp位置匹配snp rs号
+match <- data.table::fread("/home/wangzhe/projects/gwas/SNP_data/gcta_pca/snp150_hg19.txt.gz", header = T, data.table=F, check.names = F,sep = "\t" )
+
+# > head(match)
+#   chromosome:start         name
+# 1          1:10039  rs978760828
+# 2          1:10043 rs1008829651
+# 3          1:10051 rs1052373574
+```
+# write_xlsx vs write_delim
+
+# github
+```{bash}
+# 撤销commit 上次
+git reset --soft HEAD^
+# 当大于100M就不要存了。容易push fail
+```
+

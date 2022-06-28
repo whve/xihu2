@@ -14,7 +14,10 @@ rsync -avzP ~/Desktop/V1_phe华科队列巨大儿_低出生体重.xls wangzhe@17
 ## download----
 # re_linear_00.assoc.linear.gz
 # rsync -avzP wangzhe@172.16.55.11:/home/wangzhe/projects/xihu2gwas_github/re_linear_00.assoc.linear.gz ./
-  
+# download summary data summary
+rsync -avzP wangzhe@172.16.55.11:/home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_low.assoc_e-2.logistic.gz /Users/vw/Projects/Github_projects/gwas_xihu/
+rsync -avzP wangzhe@172.16.55.11:/home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_huge.assoc_e-2.logistic /Users/vw/Projects/Github_projects/gwas_xihu/
+
 
 library(tidyverse)
 library(readxl) 
@@ -75,6 +78,16 @@ cov_pca_age <- pca1 %>%
 
 
 write_delim(cov_pca_age, "data/pca10_age_4342.txt",col_names = F)
+
+
+# ____________________----
+# 😊  tips ----
+## 🪝任务在一个rstudio内会出问题，要学会建立单独的运行空间----
+### Heading 2 ----
+
+
+
+# ____________________----
 
 
 
