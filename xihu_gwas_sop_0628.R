@@ -84,7 +84,22 @@ write_delim(cov_pca_age, "data/pca10_age_4342.txt",col_names = F)
 # 😊  tips ----
 ## 🪝任务在一个rstudio内会出问题，要学会建立单独的运行空间----
 ### Heading 2 ----
-
+# snp位置匹配snp rs号----
+match <- data.table::fread("/home/wangzhe/projects/gwas/SNP_data/gcta_pca/snp150_hg19.txt.gz", header = T, data.table=F, check.names = F,sep = "\t" )
+# > head(match)
+#   chromosome:start         name
+# 1          1:10039  rs978760828
+# 2          1:10043 rs1008829651
+# 3          1:10051 rs1052373574
+library(tidyverse)
+library(readxl) 
+gw1 <- read_excel("/home/wangzhe/projects/gwas/SNP_data/re_logistic.assoc2.logistic.xlsx")
+head(gw1)
+colnames(gw1)
+data1 <- gw1 %>% filter(P<10e-8) %>% 
+  mutate("chromosome:start" = SNP)
+need=dplyr::left_join(data1,match,by="chromosome:start") #如果snp150_hg19.txt文件中有对应的RS号，则比对到test.txt文件中，如果没有的话，就变为NA
+writexl::write_xlsx(need, "/home/wangzhe/projects/gwas/SNP_data/re SNP_logistic.assoc2.logistic.xlsx")
 
 
 # ____________________----

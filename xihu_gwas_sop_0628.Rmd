@@ -163,14 +163,7 @@ data1 <- data %>%
 write_delim(data1, "/home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc_pvalue8.logistic",col_names = T) # 注意保存文件的分隔符
 system("gzip /home/wangzhe/projects/gwas_cov_pca_age_logic/res_pca10_age_4000.assoc_pvalue8.logistic")
 
-# snp位置匹配snp rs号
-match <- data.table::fread("/home/wangzhe/projects/gwas/SNP_data/gcta_pca/snp150_hg19.txt.gz", header = T, data.table=F, check.names = F,sep = "\t" )
 
-# > head(match)
-#   chromosome:start         name
-# 1          1:10039  rs978760828
-# 2          1:10043 rs1008829651
-# 3          1:10051 rs1052373574
 ```
 
 # write_xlsx vs write_delim
