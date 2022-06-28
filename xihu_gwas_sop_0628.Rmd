@@ -36,19 +36,16 @@ duration（孕期） linear。
 病例对照研究 （Case-control study）: 是指以现在患有某病的病人为患病组（称为 Case），以未患该病但其它条件与病例组相似的人为另对照组（称为 Control）。\
 plink 的语境叫"case and control"，即表型值数据是两类数据：1,2（是，否？【早产 巨大儿？】），其中 0 和-9 都表示缺失。
 
-| data                           | 来源              | 是否gwas |
-|--------------------------------|-------------------|----------|
-| raw data fam file              | [***4945***]{.ul} |          |
-| excel Phenotype table          | 4946              |          |
-| excel Phenotype table 验证子集 | 1063              | 1?       |
-| gwas表型raw data数             | [*4342*]{.ul}     | 1        |
-| 验证子集 raw data 数           | 527               |          |
-| 巨大（小）儿集 excel Phenotype table           | 4898               |    0      |
-| 巨大（小）儿集 raw data 数(表型信息old&huge交集)           | 1513               |     0     |
-| 巨大（小）儿集 raw data 数（表型信息old&huge&fam交集）           | 4342               |    1      |
-
-
-
+| data                                                   | 来源              | 是否gwas |
+|--------------------------------------------------------|-------------------|----------|
+| raw data fam file                                      | [***4945***]{.ul} |          |
+| excel Phenotype table                                  | 4946              |          |
+| excel Phenotype table 验证子集                         | 1063              | 1?       |
+| gwas表型raw data数                                     | [*4342*]{.ul}     | 1        |
+| 验证子集 raw data 数                                   | 527               |          |
+| 巨大（小）儿集 excel Phenotype table                   | 4898              | 0        |
+| 巨大（小）儿集 raw data 数(表型信息old&huge交集)       | 1513              | 0        |
+| 巨大（小）儿集 raw data 数（表型信息old&huge&fam交集） | 4342              | 1        |
 
 ```{bash}
 #eg 4760 = 4946 -> drop_na(preterm)
@@ -98,6 +95,7 @@ plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno 
 ## 连续性状（定量性状）linear
 
 # a3 output data
+
 ```{bash}
 awk '!/'NA'/' re_logistic_pca10_age_4342_low.assoc.logistic >re_logistic_pca10_age_4342_low.assoc_NA.logistic
 awk '!/'NA'/' re_logistic_pca10_age_4342_huge.assoc.logistic >re_logistic_pca10_age_4342_huge.assoc_NA.logistic
@@ -142,6 +140,7 @@ gzip /home/wangzhe/projects/xihu2_0628/output/re_logistic_pca10_age_4342_huge.as
 # with python
 
 # 自动化处理
+
 ```{bash}
 # 去除NA行
 awk '!/'NA'/' re_linear_v1.assoc.linear >re_linear_v1.assoc2.linear
@@ -173,12 +172,17 @@ match <- data.table::fread("/home/wangzhe/projects/gwas/SNP_data/gcta_pca/snp150
 # 2          1:10043 rs1008829651
 # 3          1:10051 rs1052373574
 ```
+
 # write_xlsx vs write_delim
 
 # github
+
 ```{bash}
 # 撤销commit 上次
 git reset --soft HEAD^
-# 当大于100M就不要存了。容易push fail
-```
+# 当gz大于100M,文本>50M就不要存了。容易push fail
+# 瞎搞搞定：当前分支的最新提交落后于
+git push -u origin +master
+#Everything up-to-date
 
+```
