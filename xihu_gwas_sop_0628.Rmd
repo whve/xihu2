@@ -1,0 +1,104 @@
+---
+title: "xihu gwas 0628"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# a1 data import
+
+## raw data overview
+
+表型:早产、超大超小婴儿(lowbirthwt、macrosomia)。logistic。
+
+duration（孕期） linear。
+
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| id | 表型       | 方法     | 协变量    | 样本量N | Job id         | gwas name                                    |
++====+============+==========+===========+=========+================+==============================================+
+| 1  | perterm    | logistic | pca10+age | 4342    | FUMA_job186763 | res_pca10_age_4000.assoc_pvalue2.logistic.gz |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| 1  | lowbirthwt | logistic | pca10+age | 4342    | xxx            | xxx                                          |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| 1  | macrosomia | logistic | pca10+age | 4342    | xxx            | xxx                                          |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+
+## cov(xxbmld) = pca + 年龄
+
+样本数一致。
+
+# a2 plink command
+
+## 阈值性状（1,2）-\> logistic逻辑回归
+
+病例对照研究 （Case-control study）: 是指以现在患有某病的病人为患病组（称为 Case），以未患该病但其它条件与病例组相似的人为另对照组（称为 Control）。\
+plink 的语境叫"case and control"，即表型值数据是两类数据：1,2（是，否？【早产 巨大儿？】），其中 0 和-9 都表示缺失。
+
+| data                           | 来源              | 是否gwas |
+|--------------------------------|-------------------|----------|
+| raw data fam file              | [***4945***]{.ul} |          |
+| excel Phenotype table          | 4946              |          |
+| excel Phenotype table 验证子集 | 1063              | 1?       |
+| gwas表型raw data数             | [*4342*]{.ul}     | 1        |
+| 验证子集 raw data 数           | 527               |          |
+| 巨大（小）儿集 excel Phenotype table           | 4898               |    0      |
+| 巨大（小）儿集 raw data 数(表型信息old&huge交集)           | 1513               |     0     |
+| 巨大（小）儿集 raw data 数（表型信息old&huge&fam交集）           | 4342               |    1      |
+
+
+
+
+```{bash}
+#eg 4760 = 4946 -> drop_na(preterm)
+/home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts -> raw data
+wc -l /home/wangzhe/projects/xihu2gwas_github/phe2plus00.txt -> bcx; 🆚 （row 4760）
+wc -l /home/wangzhe/projects/gwas/SNP_data/gcta_pca/pca10_age_4000.txt -> cov 🆚 （row 4342）
+wc -l /home/wangzhe/projects/xihu2gwas_github/phe2plus00.txt (4760)
+
+[/home/wangzhe/projects/gwas/SNP_data/gcta_pca]wc -l pca10.eigenvec
+4945 pca10.eigenvec
+
+制作lowbirthwt、macrosomia，看看是否修改cov
+这个是否用1，0表示？
+ID	lowbirthwt	macrosomia
+V1_0010202	0	0
+V1_0010204	0	0
+V1_0010205	0	0
+
+此处是否用1，2表示？
+0010202 0010202 2
+0010204 0010204 2
+0010205 0010205 2
+
+数据处理，merge than 把0 -> 2
+
+1513 phe
+1513 cov
+# hi.R
+
+
+```
+
+```{bash}
+#eg
+#plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/github_star/GWA_tutorial/phe2.txt --logistic --covar /home/wangzhe/projects/gwas/SNP_data/gcta_pca/pca10_age_4000.txt --out res_pca10_age_4000xxx --allow-no-sex
+
+plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2gwas_github/phe2plus00.txt --logistic --covar /home/wangzhe/projects/gwas/SNP_data/gcta_pca/pca10_age_4000.txt --out re_logistic --allow-no-sex
+
+# togo
+## lowbirthwt
+plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2_0628/data/phe_sma.txt --logistic --covar /home/wangzhe/projects/xihu2_0628/data/pca10_age_4342.txt --out re_logistic_pca10_age_4342_low --allow-no-sex
+## macrosomia
+plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2_0628/data/phe_huge.txt --logistic --covar /home/wangzhe/projects/xihu2_0628/data/pca10_age_4342.txt --out re_logistic_pca10_age_4342_huge --allow-no-sex
+
+```
+
+## 连续性状（定量性状）linear
+
+# a3 output data
+
+# plot
+
+# with python
