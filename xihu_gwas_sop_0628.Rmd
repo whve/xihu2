@@ -11,19 +11,45 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## raw data overview
 
-表型:早产、超大超小婴儿(lowbirthwt、macrosomia)。logistic。
+表型:早产（preterm）、超大超小婴儿(lowbirthwt、macrosomia)。logistic。
 
 duration（孕期） linear。
+
+
+note：  
+
+### 阈值性状（1,2
+
+plink 的语境叫“case and control”，即表型值数据是两类数据：1,2，其中 0 和-9 都
+表示缺失。可以选择的方法有卡方检验和逻辑斯蒂回归（X2 关联分析和 logistic
+分析）。  
+
+• --assoc，不允许有协变量 
+• --logistic，允许有协变量，如果考虑协变量，速度变慢。比 assoc 速度慢。
+
+### 连续性状（定量性状）
+
+这里的性状时连续性状，也就是除了 1,2，0，-9 外还有其它数值，--assoc 会进行
+T 检验（Student's test），还可以用--linear 进行分析。 
+
+• --assoc，不允许有协变量，速度快  
+• --linear，允许有协变量，速度慢
+
 
 +----+------------+----------+-----------+---------+----------------+----------------------------------------------+
 | id | 表型       | 方法     | 协变量    | 样本量N | Job id         | gwas name                                    |
 +====+============+==========+===========+=========+================+==============================================+
-| 1  | perterm    | logistic | pca10+age | 4342    | FUMA_job186763 | res_pca10_age_4000.assoc_pvalue2.logistic.gz |
+| 1  | perterm_zkij | logistic | pca10+age | 4342?    | FUMA_job186763 | res_pca10_age_4000.assoc_pvalue2.logistic.gz |
 +----+------------+----------+-----------+---------+----------------+----------------------------------------------+
-| 1  | lowbirthwt | logistic | pca10+age | 4342    | xxx            | xxx                                          |
+| 1  | lowbirthwt | logistic | pca10+age | 4342    | done            | xxx                                          |
 +----+------------+----------+-----------+---------+----------------+----------------------------------------------+
-| 1  | macrosomia | logistic | pca10+age | 4342    | xxx            | xxx                                          |
+| 1  | macrosomia | logistic | pca10+age | 4342    | done            | xxx                                          |
 +----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| 1  |   duration     | linear | pca10+age | 4342?    | xxx            | xxx                                          |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+
+
+
 
 ## cov(xxbmld) = pca + 年龄
 
@@ -84,11 +110,16 @@ V1_0010205	0	0
 
 plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2gwas_github/phe2plus00.txt --logistic --covar /home/wangzhe/projects/gwas/SNP_data/gcta_pca/pca10_age_4000.txt --out re_logistic --allow-no-sex
 
-# togo
+# --logistic done
 ## lowbirthwt
 plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2_0628/data/phe_sma.txt --logistic --covar /home/wangzhe/projects/xihu2_0628/data/pca10_age_4342.txt --out re_logistic_pca10_age_4342_low --allow-no-sex
 ## macrosomia
 plink --bfile /home/wangzhe/projects/gwas/SNP_data/selected_two_cohorts --pheno /home/wangzhe/projects/xihu2_0628/data/phe_huge.txt --logistic --covar /home/wangzhe/projects/xihu2_0628/data/pca10_age_4342.txt --out re_logistic_pca10_age_4342_huge --allow-no-sex
+
+         re_logistic_pca10_age_4342_huge
+results: re_logistic_pca10_age_4342_low + .assoc.logistic
+
+res_cov? + sample? auto+ .assoc.logistic or assoc.linear
 
 ```
 

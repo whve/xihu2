@@ -1,0 +1,98 @@
+---
+title: "0701"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### 阈值性状（1,2
+
+plink 的语境叫“case and control”，即表型值数据是两类数据：1,2，其中 0 和-9 都
+表示缺失。可以选择的方法有卡方检验和逻辑斯蒂回归（X2 关联分析和 logistic
+分析）。  
+
+• --assoc，不允许有协变量 
+• --logistic，允许有协变量，如果考虑协变量，速度变慢。比 assoc 速度慢。
+
+### 连续性状（定量性状）
+
+这里的性状时连续性状，也就是除了 1,2，0，-9 外还有其它数值，--assoc 会进行
+T 检验（Student's test），还可以用--linear 进行分析。 
+
+• --assoc，不允许有协变量，速度快  
+• --linear，允许有协变量，速度慢
+
+
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| id | 表型       | 方法     | 协变量    | 样本量N | Job id         | gwas name                                    |
++====+============+==========+===========+=========+================+==============================================+
+| 1  | perterm_zkij | logistic | pca10+age | 4342    | FUMA_job186763 | res_pca10_age_4000.assoc_pvalue2.logistic.gz |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+| 1  |   duration     | linear | none | 4342    | xxx            | xxx                                          |
++----+------------+----------+-----------+---------+----------------+----------------------------------------------+
+
+res_pca10_age_4000 ??  
+
+re_linear_00.assoc.linear.gz
+
+```{r}
+
+library(data.table)
+# if not .gz, can i use fread
+data_linear <- data.table::fread("/home/wangzhe/projects/xihu2gwas_github/re_linear_00.assoc.linear.gz") 
+#system.time(t2 <- fread(____))
+library(tidyverse)
+data1 <- data_linear %>% 
+  filter(P<10e-2) #  1125601
+write_delim(data1, "/home/wangzhe/projects/xihu2_0628/output/re_linear_00_e2.assoc.linear",col_names = T) # 注意保存文件的分隔符是？
+
+
+# 压缩 gzip re_linear_00_e2.assoc.linear
+
+# rsync -avzP wangzhe@172.16.55.11:/home/wangzhe/projects/xihu2_0628/output/re_linear_00_e2.assoc.linear.gz /Users/vw/Projects/Github_projects/gwas_xihu/
+
+```
+
+
+
+第六章：GWAS 的 GLM 模型
+
+包括三个文件：plink 文件（b.map, b.ped)和表型
+数据文件(phe.txt)，协变量文件（cov.txt）
+
+
+我们先从没有协变量的一般线性模型（LM）模型开始，然后加入数据类型的协变
+量，然后加入因子类型的协变量（这里需要进行虚拟变量的转化），然后将数值协
+变量和因子变量放在一起作为协变量，然后将 PCA 的值作为协变量加进去，这样
+一般线性模型分析完成。
+
+最后我们使用混合线性模型（LMM），
+不考虑协变量，
+然后加入协变量，
+然后将
+PCA 加入协变量
+
+第七章：GWAS 的 GLM 模型：添加协变量
+
+第八章：GWAS 的 GLM 模型：因子协变量
+
+因子协变量？
+
+
+第九章：GWAS 的 GLM 模型：数字+因子协变量
+GWAS 分析时，无论是一般线性模型，还是广义线性模型，都要对协变量进行处理。
+数值类型的协变量（比如初生重数值协变量，PCA 的值）直接加进去，因子协变
+量（比如不同的年份，不同的地点，场等）需要转化为虚拟变量。如果一个分析中，
+既有数字协变量，又有因子协变量，需要将因子协变量转化为虚拟变量后再与数字
+协变量合并，作为最终的协变量文件进行分析。本次用实际数据进行一下演示。
+
+
+第十章：GWAS 的 GLM 模型：协变量+PCA
+
+从开始介绍 plink 做 GWAS 数据的质控，到构建模型，到定义协变量，已经灌了很多水，这篇是
+plink 做 GWAS 的结尾，因为 plink 做 GWAS 只有两个模型可以用：GLM 和 logistic，前者分析数量性
+状，后者分析二分类性状。而现在 GWAS 更多使用 LMM 模型，这个模型 plink 没法做，以后几篇介
+绍 GEMMA 的操作方法。
+
